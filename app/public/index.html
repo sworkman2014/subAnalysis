@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Subs by University</title>
+
+  <!-- Latest compiled and minified CSS & JS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <!-- Font Awesome Glyphicons -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="jumbotron">
+      <h1>Subs by University</h1>
+      <hr>
+
+      <br>
+
+
+      <div>
+         <select id="university-select"></select>
+      </div>
+
+      <div>
+          <form>
+            <input type="text" id="sub-input" />
+            <button type="submit" class="btn btn-primary submit">Submit</button>
+        </form>
+          
+      </div>
+<div class="results">
+    <table>
+        <tbody>
+            <tr>
+                <th>Date Subbed</th>
+                <th>Title</th>
+                <th>Subbing For</th>
+                <th>Hours</th>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<div class="sub-info"></div>
+
+<div class="sub-rows">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date Subbed</th>
+                    <th>Day</th>
+                    <th>Name</th>
+                    <th>Is Sub?</th>
+                    <th>Title</th>
+                    <th>Subbing For</th>
+                    <th>Hours</th>
+                    <th>Cohort</th>
+
+                </tr>
+                
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+    </div>
+
+    <footer class="footer">
+
+    </footer>
+
+  </div>
+
+
+</body>
+<script type="text/javascript">
+
+  $(document).ready(function(){
+
+$('.submit').on('click', function(event){
+    event.preventDefault();
+
+    var subInput = {subInput: $('#sub-input').val()}
+
+$.post("/api/findsub", subInput,
+      function(data) {
+        //   console.log(data)
+        // var subList = $('<>');
+        if(data){
+            for(i = 0; i < data.length; i++){
+                var subListItem = $('<tr><td>'+ data[i].dateSubbed +'</td><td>'+ data[i].title + '</td><td>'+data[i].subbingFor+ '</td><td>'+data[i].hours+'</td></tr>')
+                // subList.append(subListItem)
+                $('.results table tbody').append(subListItem)
+
+            }
+        }else{
+            $('.results').html("<p>No Results</p>")
+
+        }
+            
+      }
+    )
+
+})
+
+
+    $.ajax({ url: "/api/universities", method: "GET" })
+      .then(function(universityData) {
+
+        for (var j = 0; j < universityData.length; j++){
+            var universitySelect = $('<select id="universityselect">')
+        var optionItem = $('<option value="'+universityData[j]+'">'+ universityData[j] + '</option>')
+        $('#university-select').append(optionItem);
+}    
+
+      });
+
+
+      $('#university-select').on('change', function(){
+          $('.sub-info').empty();
+          $('.sub-rows table tbody').empty();
+        //   console.log($(this).val());
+        var universityVal = {userSelect: $(this).val()}
+        $.ajax({ url: "/api/subs", method: "POST", data: universityVal })
+      .then(function(subInfo) {
+
+        var parsedSubNames = JSON.parse(subInfo.trueSubs);
+        $('.sub-info').append('<strong>Total # of Substitutions: </strong>'+'<p> '+subInfo.totalSubCount+'</p>')
+        $('.sub-info').append('<strong>Total # of Times IR Staff Used as Sub: </strong>'+'<p> '+subInfo.totalIRsubs+'</p>')
+        $('.sub-info').append('<strong>Total # of Times TA got a Sub: </strong>'+'<p> '+subInfo.taSubCount+'</p>')
+        $('.sub-info').append('<strong>Total # of Times Instructor got a Sub: </strong>'+'<p> '+subInfo.instSubCount+'</p>')
+        $('.sub-info').append('<strong>Total # of times TA Subbed for Instructor: </strong>'+'<p> '+subInfo.totalTAsubbingForInst+'</p>')
+
+
+        $('.sub-info').append('<strong>Total # of Subs Used: </strong>'+'<p> '+parsedSubNames.length+'</p>')
+        
+        for(m = 0; m<parsedSubNames.length; m++){
+            $('.sub-info').append('<p>'+parsedSubNames[m]+'</p>')
+
+        }
+        console.log(JSON.parse(subInfo.subData))
+        
+        var resultSubData = JSON.parse(subInfo.subData);
+    console.log(resultSubData[0])
+    var weekday = new Array(7);
+weekday[0] =  "Sunday";
+weekday[1] = "Monday";
+weekday[2] = "Tuesday";
+weekday[3] = "Wednesday";
+weekday[4] = "Thursday";
+weekday[5] = "Friday";
+weekday[6] = "Saturday";
+        for(var i = 0; i<resultSubData.length; i++){
+            var subRow = $('<tr><td>'+ resultSubData[i].dateSubbed +'</td><td>'+weekday[new Date(resultSubData[i].dateSubbed).getDay()]+'</td><td>'+ resultSubData[i].subName + '</td><td>'+resultSubData[i].isSub+'</td><td>'+ resultSubData[i].title + '</td><td>'+resultSubData[i].subbingFor+ '</td><td>'+resultSubData[i].hours+'</td><td>'+resultSubData[i].cohort+'</td></tr>')
+                $('.sub-rows table tbody').append(subRow)
+        }
+
+
+      });
+      })
+
+
+  })
+</script>
+</html>
