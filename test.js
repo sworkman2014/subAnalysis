@@ -1,4 +1,4 @@
-
+// for parsing the google sheets csv to json --> subs.csv
 var fs = require('fs'); 
 var parse = require('csv-parse');
 
