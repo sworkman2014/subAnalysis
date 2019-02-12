@@ -39,7 +39,7 @@
                     <thead class="ind-sub thead-dark">
 
                     </thead>
-                    <tbody>
+                    <tbody class="ind-sub">
 
                     </tbody>
                 </table>
@@ -115,7 +115,7 @@
                 if (data === undefined || data.length == 0) {
                     $('#sub-input').val('').change();
                     $('.ind-sub').empty();
-                    $('tbody').empty();
+                    
                     console.log("results were not found")
                     $('.no-results').text("No Results Found")
                 } else {
