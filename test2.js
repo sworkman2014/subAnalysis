@@ -1,4 +1,4 @@
-
+// for parsing the sf csv to json --> sf-ir-report.csv
 var fs = require('fs'); 
 var parse = require('csv-parse');
 
@@ -18,9 +18,9 @@ fs.createReadStream('sf-ir-report.csv')
         
     })
     .on('end',function() {
-          //do something wiht csvData
-          console.log(irDataArr);
-          fs.writeFile('ir-data.js', JSON.stringify(irDataArr), function(err, data){
+        //do something wiht csvData
+        console.log(irDataArr);
+        fs.writeFile('ir-data.js', JSON.stringify(irDataArr), function(err, data){
             if (err) console.log(err);
             console.log("Successfully Written to File.");
         });
